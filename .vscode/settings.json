@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "kmalloc.h": "c",
+        "util.h": "c",
+        "vga.h": "c"
+    }
+}
