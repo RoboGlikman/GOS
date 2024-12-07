@@ -1,2 +1,2 @@
-run.sh
-.vscode/setting.json
+*.sh
+.vscode/*
