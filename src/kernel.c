@@ -22,6 +22,6 @@ void kmain(uint32_t magic, struct multiboot_info* bootInfo) {
     initMemory(bootInfo->mem_upper * 1024, physicalAllocStart);
     kmallocInit(0x1000); 
 
-    printf("all done!\n");
+    printf("all completed!\n");
     for(;;);
 }
