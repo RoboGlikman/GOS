@@ -37,7 +37,7 @@ void initMemory(uint32_t memHigh, uint32_t physicalAllocStart) {
     invalidatePageDir(0xFFFFF000); // invalidate another preset pd
         
     pmm_init(physicalAllocStart, memHigh);
-    memset(pageDirs, 0, 1024 * NUM_PAGE_DIRS);
+    memset(pageDirs, 0, 0x1000 * NUM_PAGE_DIRS);
     memset(usedPageDirs, 0, NUM_PAGE_DIRS);
 }
 
@@ -63,7 +63,7 @@ uint32_t pmmAllocPageFrame(){
         }
     }
 
-    return -1;
+    return 0;
 }
 
 uint32_t* memGetCurrentPageDir(){
@@ -128,6 +128,8 @@ void memMapPage(uint32_t vAddr, uint32_t physAddr, uint32_t flags){
     }
 
 }
+
+
 void invalidatePageDir(uint32_t vaddr){
     asm volatile("invlpg %0" :: "m"(vaddr));
 }

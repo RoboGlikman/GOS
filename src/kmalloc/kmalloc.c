@@ -3,6 +3,8 @@
 #include "../memory/memory.h"
 #include "../util/util.h"
 
+//TODO create kfree, kmalloc
+
 static uint32_t heapStart;
 static uint32_t heapSize;
 static uint32_t threshold;
@@ -13,9 +15,9 @@ void kmallocInit(uint32_t initialHeapSize){
     heapSize = 0;
     threshold = 0;
     kmallocInitialized = true;
-
+    
     changeHeapSize(initialHeapSize);
-    *((uint32_t*)heapStart) = 0;
+    *((uint32_t*)heapStart) = 0; 
 }
 
 void changeHeapSize(int newHeapSize){
