@@ -41,3 +41,11 @@ void* memcpy(void* restrict dstptr, const void* restrict srcptr, uint32_t size) 
 	return dstptr;
 }
 
+int32_t strcmp(char s1[], char s2[]) {
+    uint32_t i;
+    for (i = 0; s1[i] == s2[i]; i++) {
+        if (s1[i] == '\0') return 0;
+    }
+    return s1[i] - s2[i];
+}
+
