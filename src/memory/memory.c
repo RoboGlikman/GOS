@@ -8,7 +8,7 @@
 #define NUM_PAGE_FRAMES (0x100000000 / 0x1000 / 8)
 
 static uint32_t pageFrameMin;
-static uint32_t pageFrameMax; 
+static uint32_t pageFrameMax;
 static uint32_t totalPagesAllocated;
 
 uint8_t physicalMemoryBitmap[NUM_PAGE_FRAMES / 8]; //todo: dynamic array, bit array instead
