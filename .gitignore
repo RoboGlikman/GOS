@@ -4,3 +4,5 @@
 # Ignore all .sh files
 *.sh
 
+#Ignore vscode files
+.vscode/*
