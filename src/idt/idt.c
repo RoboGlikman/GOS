@@ -1,5 +1,5 @@
 #include "../stdint.h"
-#include "../util/util.h"
+#include "../stdlib/memutil/memutil.h"
 #include "../vga/vga.h"
 #include "idt.h"
 

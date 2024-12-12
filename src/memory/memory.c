@@ -1,8 +1,8 @@
 #include "../stdint.h"
 #include "../multiboot.h"
 #include "memory.h"
-#include "../stdlib/stdio.h"
-#include "../util/util.h"
+#include "../stdlib/stdio/stdio.h"
+#include "../stdlib/memutil/memutil.h"
 
 #define NUM_PAGE_DIRS 256
 #define NUM_PAGE_FRAMES (0x100000000 / 0x1000 / 8)

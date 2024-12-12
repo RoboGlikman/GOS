@@ -1,13 +1,13 @@
-#include "stdlib/stdio.h"
+#include "stdlib/stdio/stdio.h"
 #include "gdt/gdt.h"
-#include "idt/idt.h"`
+#include "idt/idt.h"
 #include "vga/vga.h"
 #include "timer/timer.h"
 #include "keyboard/keyboard.h"
 #include "multiboot.h"
 #include "memory/memory.h"
 #include "kmalloc/kmalloc.h"
-#include "stdlib/string.h"
+#include "stdlib/string/string.h"
 void kmain(uint32_t magic, struct multiboot_info* bootInfo);
 
 void kmain(uint32_t magic, struct multiboot_info* bootInfo) {

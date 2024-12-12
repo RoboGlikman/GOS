@@ -1,7 +1,7 @@
 #include "../stdint.h"
-#include "../util/util.h"
+#include "../stdlib/memutil/memutil.h"
 #include "../idt/idt.h"
-#include "../stdlib/stdio.h"
+#include "../stdlib/stdio/stdio.h"
 #include "keyboard.h"
 
 bool capsOn;

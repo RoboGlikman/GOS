@@ -1,5 +1,5 @@
 #include "gdt.h"
-#include "../util/util.h"
+#include "../stdlib/memutil/memutil.h"
 
 extern void gdt_flush(uint32_t);
 extern void tss_flush();

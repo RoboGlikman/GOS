@@ -1,7 +1,7 @@
 #include "kmalloc.h"
 #include "../stdint.h"
 #include "../memory/memory.h"
-#include "../util/util.h"
+#include "../stdlib/memutil/memutil.h"
 
 //TODO create kfree, kmalloc
 
