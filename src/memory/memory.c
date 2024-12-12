@@ -37,7 +37,7 @@ void initMemory(uint32_t memHigh, uint32_t physicalAllocStart) {
     invalidatePageDir(0xFFFFF000); // invalidate another preset pd
         
     pmm_init(physicalAllocStart, memHigh);
-    memset(pageDirs, 0, 0x1000 * NUM_PAGE_DIRS);
+    memset(pageDirs, 0, 0x1000 * NUM_PAGE_DIRS); //! should probably be 1024*NUM_PAGE_DIRS
     memset(usedPageDirs, 0, NUM_PAGE_DIRS);
 }
 

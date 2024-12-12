@@ -13,12 +13,12 @@ OBJS_C = $(SRC_C:.c=.o)
 OBJS_S = $(SRC_S:.s=.s.o)
 OBJS = $(OBJS_C) $(OBJS_S)
 
-all: clean kernel image
+all: clean srcs image
 
 clean:
 	rm -rf $(REM)
 
-kernel: $(OBJS)
+srcs: $(OBJS)
 
 %.s.o: %.s
 	$(AS) $(ASFLAGS) $< -o $@
