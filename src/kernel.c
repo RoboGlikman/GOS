@@ -6,9 +6,12 @@
 #include "keyboard/keyboard.h"
 #include "multiboot.h"
 #include "memory/memory.h"
-#include "mm/mm.h"
+#include "MemoryAllocator/ma.h"
 #include "stdlib/string/string.h"
+
+
 void kmain(uint32_t magic, struct multiboot_info* bootInfo);
+
 
 void kmain(uint32_t magic, struct multiboot_info* bootInfo) {
     Reset();
