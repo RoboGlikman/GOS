@@ -6,7 +6,7 @@
 #include "keyboard/keyboard.h"
 #include "multiboot.h"
 #include "memory/memory.h"
-#include "MemoryAllocator/ma.h"
+#include "MemoryManager/mm.h"
 #include "stdlib/string/string.h"
 
 

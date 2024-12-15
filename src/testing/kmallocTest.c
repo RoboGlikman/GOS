@@ -1,5 +1,5 @@
 #include "kmallocTest.h"
-#include "../MemoryAllocator/ma.h"
+#include "../MemoryManager/mm.h"
 #include "../stdlib/stdio/stdio.h"
 
 void test_kmalloc_kfree() {
