@@ -1,6 +1,6 @@
 #pragma ocne
 void initMemory(uint32_t memHigh, uint32_t physicalAllocStart);
-void invalidatePageDir(uint32_t vaddr);
+void invalidate(uint32_t vaddr);
 uint32_t pmmAllocPageFrame();
 void memMapPage(uint32_t vAddr, uint32_t physAddr, uint32_t flags);
 void syncPageDirs();

@@ -31,13 +31,13 @@ void pmm_init(uint32_t mem_low, uint32_t mem_high){
 void initMemory(uint32_t memHigh, uint32_t physicalAllocStart) {
     mem_number_vpages = 0;
     initial_page_dir[0] = 0;
-    invalidatePageDir(0); // invalidate first pd
+    invalidate(0);
    
     initial_page_dir[1023] = ((uint32_t) initial_page_dir - KERNEL_START) |  PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE;
-    invalidatePageDir(0xFFFFF000); // invalidate another preset pd
+    invalidate(0xFFFFF000);
         
     pmm_init(physicalAllocStart, memHigh);
-    memset(pageDirs, 0, 1024 * NUM_PAGE_DIRS); //! should probably be 1024*NUM_PAGE_DIRS (curr=0x1000*NUM..)
+    memset(pageDirs, 0, 1024 * NUM_PAGE_DIRS); 
     memset(usedPageDirs, 0, NUM_PAGE_DIRS);
 }
 
@@ -109,7 +109,7 @@ void memMapPage(uint32_t vAddr, uint32_t physAddr, uint32_t flags){
     if (!(pageDir[pdIndex] && PAGE_FLAG_PRESENT)){
         uint32_t ptPAddr = pmmAllocPageFrame();
         pageDir[pdIndex] = ptPAddr | PAGE_FLAG_PRESENT | PAGE_FLAG_PRESENT | PAGE_FLAG_OWNER | flags;
-        invalidatePageDir(vAddr);
+        invalidate(vAddr);
 
         for (uint32_t i=0; i<1024; i++){
             pageTbl[i] = 0;
@@ -118,7 +118,7 @@ void memMapPage(uint32_t vAddr, uint32_t physAddr, uint32_t flags){
 
     pageTbl[ptIndex] = physAddr | PAGE_FLAG_PRESENT | flags;
     mem_number_vpages++;
-    invalidatePageDir(vAddr);
+    invalidate(vAddr);
 
     if (prevPageDir != 0){
         syncPageDirs();
@@ -130,6 +130,6 @@ void memMapPage(uint32_t vAddr, uint32_t physAddr, uint32_t flags){
 }
 
 
-void invalidatePageDir(uint32_t vaddr){
+void invalidate(uint32_t vaddr){ //invalidate TLB entry for a specific page
     asm volatile("invlpg %0" :: "m"(vaddr));
 }
