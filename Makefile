@@ -25,6 +25,6 @@ srcs: $(OBJS)
 
 image:
 	$(LD) $(LDFLAGS) -o kernel $(OBJS)
-	mv kernel Gos/boot/kernel
-	grub-mkrescue -o Gos.iso Gos/
+	mv kernel GOS/boot/kernel
+	grub-mkrescue -o GOS.iso GOS/
 	rm -rf $(REM)
