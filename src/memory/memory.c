@@ -108,7 +108,7 @@ void memMapPage(uint32_t vAddr, uint32_t physAddr, uint32_t flags){
 
     if (!(pageDir[pdIndex] && PAGE_FLAG_PRESENT)){
         uint32_t ptPAddr = pmmAllocPageFrame();
-        pageDir[pdIndex] = ptPAddr | PAGE_FLAG_PRESENT | PAGE_FLAG_PRESENT | PAGE_FLAG_OWNER | flags;
+        pageDir[pdIndex] = ptPAddr | PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE | PAGE_FLAG_OWNER | flags;
         invalidate(vAddr);
 
         for (uint32_t i=0; i<1024; i++){

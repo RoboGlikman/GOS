@@ -8,7 +8,6 @@
 static uint32_t heapStart;
 static uint32_t heapSize;
 struct heapchunk_t chunks[MAX_NUM_CHUNKS];
-static uint32_t threshold;
 static bool kmallocInitialized = false;
 uint32_t totalChunksAllocated;
 
@@ -20,7 +19,7 @@ void *kmalloc(uint32_t nBytes){
     uint32_t numChunksNeededCpy = numChunksNeeded;
 
     while (totalChunksAllocated + numChunksNeededCpy > heapSize*NUM_CHUNKS_IN_PAGE && heapSize+1 <= MAX_NUMBER_HEAP_PAGES){ // increase heap size as needed
-        changeHeapSize(heapSize + 0x1000);
+        increaseHeapSize(heapSize + 0x1000);
         numChunksNeededCpy -= NUM_CHUNKS_IN_PAGE;
     }
 
@@ -60,17 +59,16 @@ uint32_t kfree(void *ptr){
 void kmallocInit(uint32_t initialHeapSize){
     heapStart = KERNEL_MALLOC;
     heapSize = 0;
-    threshold = 0;
     kmallocInitialized = true;
     totalChunksAllocated = 0;
     memset(chunks, 0, sizeof(struct heapchunk_t)*MAX_NUM_CHUNKS);
 
-    changeHeapSize(initialHeapSize);
+    increaseHeapSize(initialHeapSize);
     *((uint32_t*)heapStart) = 0; 
 
 }
 
-void changeHeapSize(int newHeapSize){
+void increaseHeapSize(int newHeapSize){
     int oldPageTop = CEIL_DIV(heapSize, 0x1000);
     int newPageTop = CEIL_DIV(newHeapSize, 0x1000);
 

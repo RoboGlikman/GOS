@@ -2,7 +2,7 @@
 #include "../stdint.h"
 
 void kmallocInit(uint32_t initialHeapSize);
-void changeHeapSize(int newHeapSize);
+void increaseHeapSize(int newHeapSize);
 void *kmalloc(uint32_t nBytes);
 uint32_t kfree(void *ptr);
 void catchBestFit(uint32_t i, uint32_t size);
