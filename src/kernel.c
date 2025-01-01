@@ -9,7 +9,6 @@
 #include "MemoryManager/mm.h"
 #include "stdlib/string/string.h"
 
-
 void kmain(uint32_t magic, struct multiboot_info* bootInfo);
 
 
@@ -25,7 +24,6 @@ void kmain(uint32_t magic, struct multiboot_info* bootInfo) {
     initMemory(bootInfo->mem_upper * 1024, physicalAllocStart);
     
     kmallocInit(0x1000); 
-
     printf("all completed!\n");
     for(;;);
 }

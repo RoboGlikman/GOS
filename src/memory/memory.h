@@ -12,6 +12,7 @@ void memChangePageDir(uint32_t *pd);
 #define PAGE_FLAG_WRITE (1 << 1)
 #define KERNEL_START 0xC0000000
 #define KERNEL_MALLOC 0xD0000000
+#define RAMDISK_START 0xE0000000
 #define REC_PAGEDIR ((uint32_t*)0xFFFFF000)
 #define REC_PAGETBL(i) ((uint32_t*)(0xFFC00000 + ((i) << 12)))
 #define PAGE_FLAG_OWNER (1 << 9)
