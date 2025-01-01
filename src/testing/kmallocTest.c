@@ -6,6 +6,9 @@ void test_kmalloc_kfree() {
     void* ptr1 = kmalloc(100);
     if (ptr1 != (void*)0) {
         printf("Test 1: Single allocation successful.\n");
+        char *ptr11 = (char*)ptr1;
+        ptr11 = "aaaa";
+        printf("%s\n", ptr11);
         kfree(ptr1);
         printf("Test 1: Single deallocation successful.\n");
     } else {
@@ -42,5 +45,8 @@ void test_kmalloc_kfree() {
         printf("test 4: increasing heap size, allocation failed\n");
     }
 
-    void *ptr6 = kmalloc(2000000); //!if couldnt allocate is printed, it worked.
+    void *ptr6 = kmalloc(16000000);
+    if (ptr6 == (void*)0)
+        printf("test 6: success\n");
+    kfree(ptr6);
 }

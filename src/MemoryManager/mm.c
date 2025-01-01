@@ -4,7 +4,6 @@
 #include "../stdlib/memutil/memutil.h"
 #include "../stdlib/stdio/stdio.h"
 
-
 static uint32_t heapStart;
 static uint32_t heapSize;
 struct heapchunk_t chunks[MAX_NUM_CHUNKS];
@@ -15,22 +14,27 @@ void *kmalloc(uint32_t nBytes){
     if (!kmallocInitialized)
         return (void*)0;
 
-    uint32_t numChunksNeeded = CEIL_DIV(nBytes, CHUNK_SIZE_BYTES);
-    uint32_t numChunksNeededCpy = numChunksNeeded;
+    int numChunksNeeded = CEIL_DIV(nBytes, CHUNK_SIZE_BYTES);
+    int numChunksNeededCpy = numChunksNeeded;
 
-    while (totalChunksAllocated + numChunksNeededCpy > heapSize*NUM_CHUNKS_IN_PAGE && heapSize+1 <= MAX_NUMBER_HEAP_PAGES){ // increase heap size as needed
+    if (numChunksNeeded > MAX_NUM_CHUNKS){
+        printf("not enough potential space in heap.\n");
+        return (void*)0;
+    }
+
+    while ((totalChunksAllocated + numChunksNeededCpy)*256 > heapSize){ // increase heap size as needed
         increaseHeapSize(heapSize + 0x1000);
         numChunksNeededCpy -= NUM_CHUNKS_IN_PAGE;
     }
 
-    int32_t i = findBestFit(numChunksNeeded);
+    int32_t i = findBestFit_mm(numChunksNeeded);
 
     if (i < 0){
-        printf("Couldnt allocate! \n");
+        printf("Couldnt allocate! no space was found\n");
         return (void*)0;
     }
 
-    catchBestFit(i, numChunksNeeded);
+    catchBestFit_mm(i, numChunksNeeded);
     totalChunksAllocated += numChunksNeeded;
 
     return (void*)(heapStart+i*NUM_CHUNKS_IN_PAGE);
@@ -88,12 +92,12 @@ void increaseHeapSize(int newHeapSize){
 }
 
 
-int findBestFit(uint32_t n) {
+int findBestFit_mm(uint32_t n) {
     int best_fit_index = -1;
     uint32_t best_fit_size = MAX_NUM_CHUNKS;
 
-    for (uint32_t i = 0; i < MAX_NUM_CHUNKS; i++) {
-        if (!chunks[i].inuse && i + n <= MAX_NUM_CHUNKS) {
+    for (uint32_t i = 0; i < heapSize / 1000; i++) {
+        if (!chunks[i].inuse && i + n <= heapSize) {
             if (i + n < best_fit_size) {
                 best_fit_index = i;
                 best_fit_size = i + n;
@@ -104,7 +108,7 @@ int findBestFit(uint32_t n) {
     return best_fit_index;
 }
 
-void catchBestFit(uint32_t i, uint32_t size){
+void catchBestFit_mm(uint32_t i, uint32_t size){
     chunks[i].size = size;
     chunks[i].inuse = true;
     for(int j=i+1; j<i+size; j++){

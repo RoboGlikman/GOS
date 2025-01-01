@@ -1,4 +1,5 @@
-#pragma ocne
+#pragma once
+
 void initMemory(uint32_t memHigh, uint32_t physicalAllocStart);
 void invalidate(uint32_t vaddr);
 uint32_t pmmAllocPageFrame();

@@ -8,6 +8,8 @@
 #include "memory/memory.h"
 #include "MemoryManager/mm.h"
 #include "stdlib/string/string.h"
+#include "fs/ramdisk/ramdisk.h"
+#include "fs/ramfs/ramfs.h"
 
 void kmain(uint32_t magic, struct multiboot_info* bootInfo);
 
@@ -23,7 +25,9 @@ void kmain(uint32_t magic, struct multiboot_info* bootInfo) {
     uint32_t physicalAllocStart = (mod1 + 0xFFF) & ~0xFFF;
     initMemory(bootInfo->mem_upper * 1024, physicalAllocStart);
     
-    kmallocInit(0x1000); 
+    kmallocInit(0x1000);
+    ramdiskInit();
+
     printf("all completed!\n");
     for(;;);
 }
