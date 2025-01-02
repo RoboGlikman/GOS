@@ -15,6 +15,8 @@ void ramdiskInit(){
     ramdiskBase = RAMDISK_START;
     totalBlocksAllocated = 0;
     ramdiskSize = 0;
+    ramdiskInitialized = true;
+    
     memset(blockBitmap, 0, sizeof(uint8_t)*BITMAP_SIZE);
 
     increaseRamdiskSize();

@@ -10,6 +10,7 @@
 #include "stdlib/string/string.h"
 #include "fs/ramdisk/ramdisk.h"
 #include "fs/ramfs/ramfs.h"
+#include "testing/ramfsTest/ramfsTest.h"
 
 void kmain(uint32_t magic, struct multiboot_info* bootInfo);
 
@@ -24,9 +25,10 @@ void kmain(uint32_t magic, struct multiboot_info* bootInfo) {
     uint32_t mod1 = *(uint32_t*)(bootInfo->mods_addr + 4);
     uint32_t physicalAllocStart = (mod1 + 0xFFF) & ~0xFFF;
     initMemory(bootInfo->mem_upper * 1024, physicalAllocStart);
-    
     kmallocInit(0x1000);
+    
     ramdiskInit();
+    test_ramfs();
 
     printf("all completed!\n");
     for(;;);

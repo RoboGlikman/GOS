@@ -18,10 +18,12 @@ extern uint32_t totalBlocksAllocated;
 
 int ramfsCreateFile(const char *name, uint32_t size);
 int ramfsDeleteFile(const char *name);
-void ramfsWriteFile(const char *name, uint32_t offset, const void *buffer, uint32_t size);
-void ramfsReadFile(const char *name, uint32_t offset, void *buffer, uint32_t size);
+int ramfsWriteFile(const char *name, uint32_t offset, const void *buffer, uint32_t size);
+int ramfsReadFile(const char *name, uint32_t offset, void *buffer, uint32_t size);
 int catchBestFit_fs(uint32_t i, uint32_t size);
-int findBestFit_fs(uint32_t size);
+int findBestFit_fs(uint32_t size, const char *name);
+void ramfsListFiles();
+int locateFileByName(const char* name);
 
 
 
