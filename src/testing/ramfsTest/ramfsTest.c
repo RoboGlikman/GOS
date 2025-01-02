@@ -3,6 +3,7 @@
 #include "../../stdlib/stdio/stdio.h"
 #include "../../fs/ramfs/ramfs.h"
 #include "../../stdlib/string/string.h"
+#include "../../MemoryManager/mm.h"
 
 void test_ramfs(){
     const char *name1 = "file1";
@@ -26,7 +27,7 @@ void test_ramfs(){
         printf("test 2: create file with multiple blocks (and increase ramdisk size) failed!\n");
     }
     currentColor = (COLOR8_LIGHT_GREY << 8) | (COLOR8_BLACK << 12);
-
+    
     const char *buffer1 = "Hello, world!";
     int result3 = ramfsWriteFile(name1, 0, (const void*)buffer1, strlen(buffer1));
     if (result3 == 0){
@@ -37,7 +38,7 @@ void test_ramfs(){
         printf("test 3: write to file with one block failed!\n");
     }
     currentColor = (COLOR8_LIGHT_GREY << 8) | (COLOR8_BLACK << 12);
-
+    
     const char *buffer2 = "linus is the goat";
     int result4 = ramfsWriteFile(name2, 0, (const void*)buffer2, strlen(buffer2));
     if (result4 == 0){
@@ -48,17 +49,20 @@ void test_ramfs(){
         printf("test 4: write to file with multiple blocks failed!\n");
     }
     currentColor = (COLOR8_LIGHT_GREY << 8) | (COLOR8_BLACK << 12);
-
-    char *buffer3;
-    int result5 = ramfsReadFile(name2, 1, (void*)buffer3, 10);
+    
+    
+    void *buffer3 = kmalloc(10);
+    int result5 = ramfsReadFile(name2, 0, buffer3, 7);
     if (result5 == 0){
-        printf("%s\n", (const char*)buffer3);
+        printf("%s\n", (char*)buffer3);
         currentColor = (COLOR8_LIGHT_GREEN << 8) | (COLOR8_BLACK << 12);
         printf("test 5: read from file with multiple blocks at specified offset successful!\n");
+        
     } else {
         currentColor = (COLOR8_LIGHT_RED << 8) | (COLOR8_BLACK << 12);
         printf("test 5: read from file with multiple blocks at specified offset failed!\n");
     }
+    kfree(buffer3);
     currentColor = (COLOR8_LIGHT_GREY << 8) | (COLOR8_BLACK << 12);
     
     ramfsListFiles(); // test 6
@@ -74,5 +78,17 @@ void test_ramfs(){
     currentColor = (COLOR8_LIGHT_GREY << 8) | (COLOR8_BLACK << 12);
 
     ramfsListFiles(); // test 8
+
+    const char *name3 = "file3";
+    int result9 = ramfsCreateFile(name3, 100);
+    if (result9 == 0){
+        currentColor = (COLOR8_LIGHT_GREEN << 8) | (COLOR8_BLACK << 12);
+        printf("test 9: best fit successful!\n");
+    } else {
+        currentColor = (COLOR8_LIGHT_RED << 8) | (COLOR8_BLACK << 12);
+        printf("test 9: best fit failed!\n");
+    }
+    currentColor = (COLOR8_LIGHT_GREY << 8) | (COLOR8_BLACK << 12);
+    ramfsListFiles(); // test 10
 
 }

@@ -7,14 +7,13 @@
 typedef struct {
     char name[32];
     uint32_t size;
-    int start_block;
+    uint32_t start_block;
 } ramfs_file_t;
 
 extern uint8_t blockBitmap[BITMAP_SIZE];
 extern bool ramdiskInitialized;
 extern uint32_t ramdiskSize;
 extern uint32_t ramdiskBase;
-extern uint32_t totalBlocksAllocated;
 
 int ramfsCreateFile(const char *name, uint32_t size);
 int ramfsDeleteFile(const char *name);

@@ -17,12 +17,12 @@ void *kmalloc(uint32_t nBytes){
     int numChunksNeeded = CEIL_DIV(nBytes, CHUNK_SIZE_BYTES);
     int numChunksNeededCpy = numChunksNeeded;
 
-    if (numChunksNeeded > MAX_NUM_CHUNKS){
+    if (numChunksNeeded+totalChunksAllocated > MAX_NUM_CHUNKS){ 
         printf("not enough potential space in heap.\n");
         return (void*)0;
     }
 
-    while ((totalChunksAllocated + numChunksNeededCpy)*256 > heapSize){ // increase heap size as needed
+    while ((totalChunksAllocated + numChunksNeededCpy)*CHUNK_SIZE_BYTES > heapSize){ // increase heap size as needed
         increaseHeapSize(heapSize + 0x1000);
         numChunksNeededCpy -= NUM_CHUNKS_IN_PAGE;
     }

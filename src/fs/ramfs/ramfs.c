@@ -7,12 +7,10 @@
 static ramfs_file_t files[MAX_FILES];
 static uint32_t file_count = 0;
 
-//TODO check catchBestFit, findBestFit
-//TODO check ramdisk size increase and memory mapping. 
+//TODO read file causes page fault.
+//TODO the problem is probably in memMapPage() in memory.*
 
-//! there's probably a problem with the ramdisk increase and the ramfsReadFile and possibly with the ramfsWriteFile
-
-//* delete file, list file, create file (only one block) work.
+//* delete file, list file, create file work.
 
 int ramfsCreateFile(const char *name, uint32_t size){ //size = size in bytes
 
@@ -24,13 +22,12 @@ int ramfsCreateFile(const char *name, uint32_t size){ //size = size in bytes
     uint32_t numBlocksNeeded = CEIL_DIV(size, BLOCK_SIZE);
 
     if (file_count >= MAX_FILES || ramdiskSize+numBlocksNeeded > MAX_NUM_BLOCKS){
-        printf("could not create file! too many files/ramdisk size too small \n");
+        printf("could not create file! too many files/ramdisk potential size too small \n");
         return -1;
     }
 
     uint32_t numBlocksNeededCpy = numBlocksNeeded;
-
-    while (totalBlocksAllocated + numBlocksNeededCpy > ramdiskSize){
+    while (numBlocksNeededCpy != 0){
         increaseRamdiskSize();
         numBlocksNeededCpy--;
     }
@@ -51,18 +48,11 @@ int ramfsCreateFile(const char *name, uint32_t size){ //size = size in bytes
     files[file_count].size = size;
     files[file_count].start_block = i;
     file_count++;
-
-    totalBlocksAllocated += numBlocksNeeded;
-
     return 0;
     
 }
 
 int catchBestFit_fs(uint32_t i, uint32_t size){ //size = size in blocks
-    if (i >= ramdiskSize || (i + size) > ramdiskSize) {
-        return -1; 
-    }
-
     for (uint32_t j = 0; j < size; j++) {
         if (!isBlockFree(j + i)) {
             return -1;
@@ -73,7 +63,7 @@ int catchBestFit_fs(uint32_t i, uint32_t size){ //size = size in blocks
     return 0;
 }
 
-int findBestFit_fs(uint32_t size, const char *name){ // size = size on blocks
+int findBestFit_fs(uint32_t size, const char *name){ // size = size in blocks
     if (locateFileByName(name) >= 0){
         printf("file already exists!\n");
         return -1;
@@ -108,7 +98,7 @@ int findBestFit_fs(uint32_t size, const char *name){ // size = size on blocks
 }
 
 
-int ramfsDeleteFile(const char *name){
+int ramfsDeleteFile(const char *name){ //TODO when file is deleted, set its entire contents to ""
     for (uint32_t i=0; i < file_count; i++){
         if (strcmp(files[i].name, name) == 0){
             uint32_t numBlocks = CEIL_DIV(files[i].size, BLOCK_SIZE);
@@ -126,92 +116,92 @@ int ramfsDeleteFile(const char *name){
     return -1;
 }
 
-int ramfsWriteFile(const char *name, uint32_t offset, const void *buffer, uint32_t size){ //size = size in bytes
+int ramfsWriteFile(const char *name, uint32_t offset, const void *buffer, uint32_t size) {
     int fileIndex = locateFileByName(name);
-
-    if (fileIndex < 0){
-        printf("couldnt write, file not found!\n");
-        return -1; 
+    if (fileIndex < 0) {
+        printf("Error: File '%s' not found!\n", name);
+        return -1;
     }
-
 
     ramfs_file_t *file = &files[fileIndex];
-    if (offset + size > file->size){
-        printf("couldnt write, writing beyond file size is not allowed!\n");
-        return -1; 
+
+    if (offset + size > file->size) {
+        printf("Error: Writing beyond file size is not allowed!\n");
+        return -1;
     }
 
-    // Calculate starting block and initial block offset
     uint32_t currentBlock = file->start_block + (offset / BLOCK_SIZE);
     uint32_t blockOffset = offset % BLOCK_SIZE;
 
-    // Write data block by block
     uint32_t bytesWritten = 0;
     const char *src = (const char *)buffer;
+
     while (bytesWritten < size) {
- 
-        uint32_t bytesToWrite = BLOCK_SIZE - blockOffset;
-        if (bytesToWrite > size - bytesWritten)
+        uint32_t bytesToWrite = BLOCK_SIZE - blockOffset; 
+        if (bytesToWrite > size - bytesWritten) 
             bytesToWrite = size - bytesWritten;
+        
+        void *blockAddr = (void *)(ramdiskBase + currentBlock * BLOCK_SIZE); 
 
-        void *blockAddr = (void *)(ramdiskBase + currentBlock * BLOCK_SIZE);
-        memcpy((char *)blockAddr + blockOffset, src + bytesWritten, bytesToWrite);
-
+        memcpy((char *)blockAddr + blockOffset, src + bytesWritten, bytesToWrite); 
+        
         bytesWritten += bytesToWrite;
-        currentBlock++;
-        blockOffset = 0; // Reset offset for subsequent blocks
-    }
-
-    return 0; 
-}
-
-
-int ramfsReadFile(const char *name, uint32_t offset, void *buffer, uint32_t size){ //size = size in bytes
-    int fileIndex = locateFileByName(name);
-
-    if (fileIndex < 0){
-        printf("couldnt read, file not found!\n");
-        return -1;
-    }
-
-    ramfs_file_t *file = &files[fileIndex];
-
-    if (offset >= file->size){
-        printf("couldnt read, offset beyond file size!\n");
-        return -1;
-    }
-
-    // Adjust size to prevent reading beyond the file's size
-    if (offset + size > file->size)
-        size = file->size - offset;
-    
-    // Calculate starting block and initial block offset
-    uint32_t currentBlock = file->start_block + (offset / BLOCK_SIZE);
-    uint32_t blockOffset = offset % BLOCK_SIZE;
-
-    // Read data block by block
-    uint32_t bytesRead = 0;
-    char *dest = (char *)buffer;
-    while (bytesRead < size) {
-
-        uint32_t bytesToRead = BLOCK_SIZE - blockOffset;
-        if (bytesToRead > size - bytesRead)
-            bytesToRead = size - bytesRead;
-
-        void *blockAddr = (void *)(ramdiskBase + currentBlock * BLOCK_SIZE);
-        memcpy(dest + bytesRead, (char *)blockAddr + blockOffset, bytesToRead);
-
-        bytesRead += bytesToRead;
-        currentBlock++;
-        blockOffset = 0; // Reset offset for subsequent blocks
+        blockOffset = 0; 
+        currentBlock++; 
     }
 
     return 0;
 }
 
+int ramfsReadFile(const char *name, uint32_t offset, void *buffer, uint32_t size) {
+    int fileIndex = locateFileByName(name);
+    if (fileIndex < 0) {
+        printf("Error: File '%s' not found!\n", name);
+        return -1;
+    }
+
+    ramfs_file_t *file = &files[fileIndex];
+
+    if (offset >= file->size) {
+        printf("Error: Offset %u is beyond the file size %u!\n", offset, file->size);
+        return -1;
+    }
+
+    if (offset + size > file->size) 
+        size = file->size - offset;
+
+    uint32_t currentBlock = file->start_block + (offset / BLOCK_SIZE);
+    uint32_t blockOffset = offset % BLOCK_SIZE;
+
+    uint32_t bytesRead = 0;
+    char *dest = (char *)buffer;
+
+    while (bytesRead < size) {
+        uint32_t bytesToRead = BLOCK_SIZE - blockOffset; 
+        if (bytesToRead > size - bytesRead) {
+            bytesToRead = size - bytesRead;
+            
+        }
+        
+        void *blockAddr = (void *)(ramdiskBase + currentBlock * BLOCK_SIZE);
+
+        printf("bytesRead %u\n", bytesRead); //! for debugging purposes only
+        printf("bytes to read %u\n", bytesToRead);
+        printf("current block %u\n", currentBlock);
+        printf("dest+bytes read: %p\n", (void*)(dest+bytesRead));
+        printf("blockaddr+blockoffset: %p\n", (const void*)(blockAddr+blockOffset));
+        memcpy((void*)(dest + bytesRead), (const void*)(blockAddr + blockOffset), bytesToRead); 
+
+        bytesRead += bytesToRead;
+        blockOffset = 0; 
+        currentBlock++; 
+    }
+    return 0;
+}
+
 void ramfsListFiles(){
     if (file_count == 0)
-        printf("no files to list\n");
+        printf("no files to list...\n");
     for (uint32_t i=0; i<file_count; i++){
         printf("name: %s\tsize: %u bytes\n", files[i].name, files[i].size);
     }

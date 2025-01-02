@@ -12,6 +12,7 @@
 #include "fs/ramfs/ramfs.h"
 #include "testing/ramfsTest/ramfsTest.h"
 
+//#include "testing/kmallocTest/kmallocTest.h"
 void kmain(uint32_t magic, struct multiboot_info* bootInfo);
 
 
