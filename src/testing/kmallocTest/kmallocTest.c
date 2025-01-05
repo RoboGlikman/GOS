@@ -64,10 +64,10 @@ void test_kmalloc_kfree() {
     void *ptr6 = kmalloc(160000000);
     if (ptr6 == (void*)0){
         currentColor = (COLOR8_LIGHT_GREEN << 8) | (COLOR8_BLACK << 12);
-        printf("test 6: success\n");
+        printf("test 5: success\n");
     } else {
         currentColor = (COLOR8_LIGHT_RED << 8) | (COLOR8_BLACK << 12);
-        printf("test 6: failed\n");
+        printf("test 5: failed\n");
     }
     kfree(ptr6);
     currentColor = (COLOR8_LIGHT_GREY << 8) | (COLOR8_BLACK << 12);

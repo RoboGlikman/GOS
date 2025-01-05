@@ -6,7 +6,6 @@
 
 static ramfs_file_t files[MAX_FILES];
 static uint32_t file_count = 0;
-
 //TODO read file causes page fault.
 //TODO the problem is probably in memMapPage() in memory.*
 
@@ -26,8 +25,10 @@ int ramfsCreateFile(const char *name, uint32_t size){ //size = size in bytes
         return -1;
     }
 
+
     uint32_t numBlocksNeededCpy = numBlocksNeeded;
-    while (numBlocksNeededCpy != 0){
+    int j = findBestFit_fs(numBlocksNeeded, name);
+    while (numBlocksNeededCpy != 0 && j < 0){
         increaseRamdiskSize();
         numBlocksNeededCpy--;
     }

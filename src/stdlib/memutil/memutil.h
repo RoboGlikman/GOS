@@ -1,7 +1,7 @@
 #pragma once
 #include "../../stdint.h"
 
-#define CEIL_DIV(a,b) (((a+b)- 1)/b)
+#define CEIL_DIV(a, b) (((a) + (b) - 1) / (b))
 
 int memcmp(const void*, const void*, uint32_t size);
 void* memcpy(void* restrict dstptr, const void* restrict srcptr, uint32_t size);

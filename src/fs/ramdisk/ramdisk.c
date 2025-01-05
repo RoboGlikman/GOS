@@ -38,9 +38,13 @@ void increaseRamdiskSize() {
         return; 
     }
 
-    int pageTop = ramdiskSize;
+    uint32_t pageTop = ramdiskSize;
     
     uint32_t phys = pmmAllocPageFrame();
+    if (phys == 0){
+        printf("Error: Failed to allocate a page frame!\n"); 
+        return;
+    }
     memMapPage(RAMDISK_START + pageTop * 0x1000, phys, PAGE_FLAG_WRITE);
     
     ramdiskSize++;

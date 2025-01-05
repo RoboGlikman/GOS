@@ -29,7 +29,7 @@ void test_ramfs(){
     currentColor = (COLOR8_LIGHT_GREY << 8) | (COLOR8_BLACK << 12);
     
     const char *buffer1 = "Hello, world!";
-    int result3 = ramfsWriteFile(name1, 0, (const void*)buffer1, strlen(buffer1));
+    int result3 = ramfsWriteFile(name1, 0, (const void*)buffer1, strlen(buffer1)+1);
     if (result3 == 0){
         currentColor = (COLOR8_LIGHT_GREEN << 8) | (COLOR8_BLACK << 12);
         printf("test 3: write to file with one block successful!\n");
@@ -40,7 +40,7 @@ void test_ramfs(){
     currentColor = (COLOR8_LIGHT_GREY << 8) | (COLOR8_BLACK << 12);
     
     const char *buffer2 = "linus is the goat";
-    int result4 = ramfsWriteFile(name2, 0, (const void*)buffer2, strlen(buffer2));
+    int result4 = ramfsWriteFile(name2, 0, (const void*)buffer2, strlen(buffer2)+1);
     if (result4 == 0){
         currentColor = (COLOR8_LIGHT_GREEN << 8) | (COLOR8_BLACK << 12);
         printf("test 4: write to file with multiple blocks successful!\n");
@@ -51,10 +51,10 @@ void test_ramfs(){
     currentColor = (COLOR8_LIGHT_GREY << 8) | (COLOR8_BLACK << 12);
     
     
-    void *buffer3 = kmalloc(10);
-    int result5 = ramfsReadFile(name2, 0, buffer3, 7);
+    void *buffer3 = kmalloc(strlen(buffer2)+1);
+    int result5 = ramfsReadFile(name2, 0, buffer3, strlen(buffer2)+1);
     if (result5 == 0){
-        printf("%s\n", (char*)buffer3);
+        printf("%s\n", (const char*)buffer3);
         currentColor = (COLOR8_LIGHT_GREEN << 8) | (COLOR8_BLACK << 12);
         printf("test 5: read from file with multiple blocks at specified offset successful!\n");
         
