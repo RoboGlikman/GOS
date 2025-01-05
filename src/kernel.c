@@ -10,7 +10,7 @@
 #include "stdlib/string/string.h"
 #include "fs/ramdisk/ramdisk.h"
 #include "fs/ramfs/ramfs.h"
-//#include "testing/ramfsTest/ramfsTest.h"
+#include "testing/ramfsTest/ramfsTest.h"
 
 //#include "testing/kmallocTest/kmallocTest.h"
 void kmain(uint32_t magic, struct multiboot_info* bootInfo);
@@ -27,7 +27,7 @@ void kmain(uint32_t magic, struct multiboot_info* bootInfo) {
     kmallocInit(0x1000);
     //test_kmalloc_kfree();
     ramdiskInit();
-    //test_ramfs();
+    test_ramfs();
 
     //! check reading before EOF
     //! check initMemory arguments

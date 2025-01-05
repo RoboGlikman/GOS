@@ -186,11 +186,11 @@ int ramfsReadFile(const char *name, uint32_t offset, void *buffer, uint32_t size
         
         void *blockAddr = (void *)(ramdiskBase + currentBlock * BLOCK_SIZE);
 
-        printf("bytesRead %u\n", bytesRead); //! for debugging purposes only
-        printf("bytes to read %u\n", bytesToRead);
-        printf("current block %u\n", currentBlock);
-        printf("dest+bytes read: %p\n", (void*)(dest+bytesRead));
-        printf("blockaddr+blockoffset: %p\n", (const void*)(blockAddr+blockOffset));
+        //printf("bytesRead %u\n", bytesRead); //! for debugging purposes only
+        //printf("bytes to read %u\n", bytesToRead);
+        //printf("current block %u\n", currentBlock);
+        //printf("dest+bytes read: %p\n", (void*)(dest+bytesRead));
+        //printf("blockaddr+blockoffset: %p\n", (const void*)(blockAddr+blockOffset));
         memcpy((void*)(dest + bytesRead), (const void*)(blockAddr + blockOffset), bytesToRead); 
 
         bytesRead += bytesToRead;

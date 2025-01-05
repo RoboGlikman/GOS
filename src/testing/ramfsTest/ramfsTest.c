@@ -5,12 +5,14 @@
 #include "../../stdlib/string/string.h"
 #include "../../MemoryManager/mm.h"
 
+int all = 0;
 void test_ramfs(){
     const char *name1 = "file1";
     int result1 = ramfsCreateFile(name1, 4096); // 1 block
     if (result1 == 0){
         currentColor = (COLOR8_LIGHT_GREEN << 8) | (COLOR8_BLACK << 12);
         printf("test 1: create file with one block successful!\n");
+        all++;
     } else {
         currentColor = (COLOR8_LIGHT_RED << 8) | (COLOR8_BLACK << 12);
         printf("test 1: create file with one block failed!\n");
@@ -22,6 +24,7 @@ void test_ramfs(){
     if (result2 == 0){
         currentColor = (COLOR8_LIGHT_GREEN << 8) | (COLOR8_BLACK << 12);
         printf("test 2: create file with multiple blocks (and increase ramdisk size) successful!\n");
+        all++;
     } else{
         currentColor = (COLOR8_LIGHT_RED << 8) | (COLOR8_BLACK << 12);
         printf("test 2: create file with multiple blocks (and increase ramdisk size) failed!\n");
@@ -33,6 +36,7 @@ void test_ramfs(){
     if (result3 == 0){
         currentColor = (COLOR8_LIGHT_GREEN << 8) | (COLOR8_BLACK << 12);
         printf("test 3: write to file with one block successful!\n");
+        all++;
     } else {
         currentColor = (COLOR8_LIGHT_RED << 8) | (COLOR8_BLACK << 12);
         printf("test 3: write to file with one block failed!\n");
@@ -44,6 +48,7 @@ void test_ramfs(){
     if (result4 == 0){
         currentColor = (COLOR8_LIGHT_GREEN << 8) | (COLOR8_BLACK << 12);
         printf("test 4: write to file with multiple blocks successful!\n");
+        all++;
     } else {
         currentColor = (COLOR8_LIGHT_RED << 8) | (COLOR8_BLACK << 12);
         printf("test 4: write to file with multiple blocks failed!\n");
@@ -57,6 +62,7 @@ void test_ramfs(){
         printf("%s\n", (const char*)buffer3);
         currentColor = (COLOR8_LIGHT_GREEN << 8) | (COLOR8_BLACK << 12);
         printf("test 5: read from file with multiple blocks at specified offset successful!\n");
+        all++;
         
     } else {
         currentColor = (COLOR8_LIGHT_RED << 8) | (COLOR8_BLACK << 12);
@@ -66,11 +72,13 @@ void test_ramfs(){
     currentColor = (COLOR8_LIGHT_GREY << 8) | (COLOR8_BLACK << 12);
     
     ramfsListFiles(); // test 6
+    all++;
 
     int result7 = ramfsDeleteFile(name1);
     if (result7 == 0){
         currentColor = (COLOR8_LIGHT_GREEN << 8) | (COLOR8_BLACK << 12);
         printf("test 7: file deletion successful!\n");
+        all++;
     } else {
         currentColor = (COLOR8_LIGHT_RED << 8) | (COLOR8_BLACK << 12);
         printf("test 7: file deletion failed!\n");
@@ -78,17 +86,26 @@ void test_ramfs(){
     currentColor = (COLOR8_LIGHT_GREY << 8) | (COLOR8_BLACK << 12);
 
     ramfsListFiles(); // test 8
+    all++;
 
     const char *name3 = "file3";
     int result9 = ramfsCreateFile(name3, 100);
     if (result9 == 0){
         currentColor = (COLOR8_LIGHT_GREEN << 8) | (COLOR8_BLACK << 12);
         printf("test 9: best fit successful!\n");
+        all++;
     } else {
         currentColor = (COLOR8_LIGHT_RED << 8) | (COLOR8_BLACK << 12);
         printf("test 9: best fit failed!\n");
     }
     currentColor = (COLOR8_LIGHT_GREY << 8) | (COLOR8_BLACK << 12);
     ramfsListFiles(); // test 10
+    all++;
+
+    if (all == 10){
+        currentColor = (COLOR8_LIGHT_MAGENTA << 8) | (COLOR8_BLACK << 12);
+        printf("ALL TESTS ARE SUCCESSFUL!\n\n");
+        currentColor = (COLOR8_LIGHT_GREY << 8) | (COLOR8_BLACK << 12);
+    }
 
 }
