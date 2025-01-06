@@ -49,6 +49,7 @@ int ramfsCreateFile(const char *name, uint32_t size){ //size = size in bytes
     files[file_count].size = size;
     files[file_count].start_block = i;
     file_count++;
+    initFileContents(name, size);
     return 0;
     
 }
@@ -183,20 +184,15 @@ int ramfsReadFile(const char *name, uint32_t offset, void *buffer, uint32_t size
             bytesToRead = size - bytesRead;
             
         }
-        
         void *blockAddr = (void *)(ramdiskBase + currentBlock * BLOCK_SIZE);
-
-        //printf("bytesRead %u\n", bytesRead); //! for debugging purposes only
-        //printf("bytes to read %u\n", bytesToRead);
-        //printf("current block %u\n", currentBlock);
-        //printf("dest+bytes read: %p\n", (void*)(dest+bytesRead));
-        //printf("blockaddr+blockoffset: %p\n", (const void*)(blockAddr+blockOffset));
         memcpy((void*)(dest + bytesRead), (const void*)(blockAddr + blockOffset), bytesToRead); 
 
         bytesRead += bytesToRead;
         blockOffset = 0; 
         currentBlock++; 
     }
+    const char *tmp = "\0";
+    memcpy((void*)(dest+bytesRead), (const void*)tmp, 1);
     return 0;
 }
 
@@ -215,4 +211,12 @@ int locateFileByName(const char* name){
         }
     }
     return -1;
+}
+
+int initFileContents(const char* name, uint32_t size){
+    const char *buffer = "";
+    for (int i=0; i<size; i++){
+        ramfsWriteFile(name, i, (const void*)buffer, 1);
+    }
+    return 0;
 }

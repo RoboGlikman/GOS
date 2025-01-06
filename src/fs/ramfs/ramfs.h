@@ -23,6 +23,7 @@ int catchBestFit_fs(uint32_t i, uint32_t size);
 int findBestFit_fs(uint32_t size, const char *name);
 void ramfsListFiles();
 int locateFileByName(const char* name);
+int initFileContents(const char* name, uint32_t size);
 
 
 
