@@ -1,5 +1,6 @@
 #include "memutil.h"
-
+#include "../../stdint.h"
+#include "../../multiboot.h"
 void *memset(void *dest, int val, uint32_t count){
     char *temp = (char *)dest;
     for (; count != 0; count--){
@@ -50,4 +51,8 @@ void* memmove(void* dstptr, const void* srcptr, uint32_t size) {
 	}
 	return dstptr;
 }
+
+
+
+
 
