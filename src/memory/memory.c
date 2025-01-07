@@ -12,7 +12,7 @@ int mem_num_vpages;
 #define NUM_PAGES_DIRS 256
 #define NUM_PAGE_FRAMES (0x100000000 / 0x1000 / 8)
 
-uint8_t physicalMemoryBytemap[NUM_PAGE_FRAMES / 8];// / 8];
+uint8_t physicalMemoryBitmap[NUM_PAGE_FRAMES / 8];// / 8];
 
 static uint32_t pageDirs[NUM_PAGES_DIRS][1024] __attribute__((aligned(4096)));
 static uint8_t pageDirUsed[NUM_PAGES_DIRS];
@@ -22,7 +22,7 @@ void pmm_init(uint32_t memLow, uint32_t memHigh){
     pageFrameMax = memHigh / 0x1000;
     totalAlloc = 0;
 
-    memset(physicalMemoryBytemap, 0, sizeof(physicalMemoryBytemap));
+    memset(physicalMemoryBitmap, 0, sizeof(physicalMemoryBitmap));
 }
 
 uint32_t* memGetCurrentPageDir(){
@@ -95,20 +95,29 @@ uint32_t pmmAllocPageFrame(){
     uint32_t end = pageFrameMax / 8 - ((pageFrameMax & 7) != 0 ? 1 : 0);
 
     for (uint32_t b = start; b < end; b++){
-        uint8_t byte = physicalMemoryBytemap[b];
-        if (byte != 0xFF){
-            for (uint32_t i = 0; i < 8; i++){
-                if (!(byte & (1 << i))){
-                    physicalMemoryBytemap[b] |= (1 << i);
-                    totalAlloc++;
-                    return (b * 8 + i) * 0x1000;
-                }
+        uint8_t byte = physicalMemoryBitmap[b];
+        if (byte == 0xFF){
+            continue;
+        }
+
+        for (uint32_t i = 0; i < 8; i++){
+            bool used = byte >> i & 1;
+
+            if (!used){
+                byte ^= (-1 ^ byte) & (1 << i);
+                physicalMemoryBitmap[b] = byte;
+                totalAlloc++;
+
+                uint32_t addr = (b*8*i) * 0x1000;
+                return addr;
             }
         }
+        
     }
 
     return 0;
 }
+
 
 
 void initMemory(uint32_t memHigh, uint32_t physicalAllocStart){
