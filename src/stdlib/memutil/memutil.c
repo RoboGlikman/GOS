@@ -1,3 +1,4 @@
+#pragma once
 #include "memutil.h"
 #include "../../stdint.h"
 #include "../../multiboot.h"

@@ -8,16 +8,16 @@
 #include "memory/memory.h"
 #include "MemoryManager/mm.h"
 #include "stdlib/string/string.h"
-#include "fs/ramdisk/ramdisk.h"
 #include "fs/ramfs/ramfs.h"
 #include "stdlib/memutil/memutil.h"
 #include "stdint.h"
 //#include "testing/ramfsTest/ramfsTest.h"
 //#include "testing/kmallocTest/kmallocTest.h"
 
-extern uint32_t _kernel_end;
 void kmain(uint32_t magic, struct multiboot_info* bootInfo);
-uint32_t get_physical_alloc_start(struct multiboot_info* bootInfo);
+uint32_t getPhysicalAllocStart(struct multiboot_info* bootInfo);
+extern uint32_t _kernel_end;
+
 void kmain(uint32_t magic, struct multiboot_info* bootInfo) {
     Reset();
     initGdt();
@@ -25,27 +25,24 @@ void kmain(uint32_t magic, struct multiboot_info* bootInfo) {
     initTimer();
     initKeyboard();
 
-    uint32_t phys_alloc_start = get_physical_alloc_start(bootInfo);
-    //printf("Physical allocation start: 0x%x, mem_upper*1024: %u\n", phys_alloc_start, bootInfo->mem_upper * 1024);
+    uint32_t phys_alloc_start = getPhysicalAllocStart(bootInfo);
     initMemory(bootInfo->mem_upper*1024, phys_alloc_start);
 
     kmallocInit(0x1000);
+    ramfsInit();
 
-    ramdiskInit();
     printf("all completed!\n");
     for(;;);
 }
 
-uint32_t get_physical_alloc_start(struct multiboot_info* bootInfo) {
+uint32_t getPhysicalAllocStart(struct multiboot_info* bootInfo) {
     struct multiboot_mmap_entry* entry = (struct multiboot_mmap_entry*) bootInfo->mmap_addr;
     uint32_t end_entry = bootInfo->mmap_addr + bootInfo->mmap_length;
 
     uint32_t kernel_end = (uint32_t)&_kernel_end;
     uint32_t kernel_size = kernel_end - 0xC0000000;
-    //printf("kernel_end=0x%x kernel_size=0x%x\n", kernel_end, kernel_size);
     uint32_t alloc_start = 0;
     while ((uint32_t)entry < end_entry) {
-        //printf("Memory region: start=0x%x, length=0x%x, type=%u\n", entry->addr_low, entry->len_low, entry->type);
         if (entry->type == MULTIBOOT_MEMORY_AVAILABLE) {
             uint32_t region_start = entry->addr_low+ 0xC0000000;
             uint32_t region_end = region_start + entry->len_low + 0xC0000000;
@@ -58,3 +55,4 @@ uint32_t get_physical_alloc_start(struct multiboot_info* bootInfo) {
     }
     return alloc_start-0xC0000000;
 }
+

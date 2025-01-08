@@ -6,14 +6,12 @@
 
 
 uint8_t blockBitmap[BITMAP_SIZE];
-bool ramdiskInitialized = false;
 uint32_t ramdiskSize;
 uint32_t ramdiskBase;
 
 void ramdiskInit(){
     ramdiskBase = RAMDISK_START;
     ramdiskSize = 0;
-    ramdiskInitialized = true;
     
     memset(blockBitmap, 0, sizeof(blockBitmap));
 
