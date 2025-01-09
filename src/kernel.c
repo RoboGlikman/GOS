@@ -11,8 +11,7 @@
 #include "fs/ramfs/ramfs.h"
 #include "stdlib/memutil/memutil.h"
 #include "stdint.h"
-//#include "testing/ramfsTest/ramfsTest.h"
-//#include "testing/kmallocTest/kmallocTest.h"
+#include "stdlib/collections/Node/node.h"
 
 void kmain(uint32_t magic, struct multiboot_info* bootInfo);
 uint32_t getPhysicalAllocStart(struct multiboot_info* bootInfo);
@@ -31,7 +30,6 @@ void kmain(uint32_t magic, struct multiboot_info* bootInfo) {
     kmallocInit(0x1000);
     ramfsInit();
 
-    printf("all completed!\n");
     for(;;);
 }
 

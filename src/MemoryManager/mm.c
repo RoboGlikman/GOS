@@ -36,12 +36,11 @@ void *kmalloc(uint32_t nBytes){
 
     catchBestFit_mm(i, numChunksNeeded);
     totalChunksAllocated += numChunksNeeded;
-
-    return (void*)(heapStart+i*NUM_CHUNKS_IN_PAGE);
+    return (void*)(heapStart+i*CHUNK_SIZE_BYTES);
 }
 
 uint32_t kfree(void *ptr){
-    if (!ptr) {
+    if (ptr == NULL) {
         return -1;
     }
 
@@ -54,9 +53,7 @@ uint32_t kfree(void *ptr){
         chunks[i].inuse = false;
         chunks[i].size = 0;
     }
-
     totalChunksAllocated -= num_chunks;
-
     return 0;
 }
 

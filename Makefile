@@ -4,9 +4,9 @@ CFLAGS = -ffreestanding -Wall -Wextra -g -O2
 LDFLAGS = -m elf_i386 -T linker.ld
 ASFLAGS = -f elf32
 LD = /opt/cross/bin/i686-elf-ld
-REM = *.o */*.o */*/*.o */*/*/*.o
+REM = *.o */*.o */*/*.o */*/*/*.o */*/*/*/*.o
 
-SRC_C = $(wildcard src/*.c src/*/*.c src/*/*/*.c)
+SRC_C = $(wildcard src/*.c src/*/*.c src/*/*/*.c src/*/*/*/*.c)
 SRC_S = $(wildcard src/*.s src/*/*.s)
 
 OBJS_C = $(SRC_C:.c=.o)

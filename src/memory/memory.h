@@ -11,7 +11,7 @@ void syncPageDirs();
 void memMapPage(uint32_t virutalAddr, uint32_t physAddr, uint32_t flags);
 
 #define KERNEL_START 0xC0000000
-#define KERNEL_MALLOC 0xD000000
+#define KERNEL_MALLOC 0xD0000000
 #define RAMDISK_START 0xE0000000
 #define REC_PAGEDIR ((uint32_t*)0xFFFFF000)
 #define REC_PAGETABLE(i) ((uint32_t*) (0xFFC00000 + ((i) << 12)))
