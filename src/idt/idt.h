@@ -67,7 +67,8 @@ extern void irq14();
 extern void irq15();
 
 void isr_handler(struct InterruptRegisters* regs);
+void irq_handler(struct InterruptRegisters* regs);
 void initIdt();
 void setIdtGate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags);
-
+void irq_uninstall_handler(int irq);
 void irq_install_handler (int irq, void (*handler)(struct InterruptRegisters *r));

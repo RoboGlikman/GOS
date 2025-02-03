@@ -3,6 +3,8 @@
 #include "../idt/idt.h"
 #include "../stdlib/stdio/stdio.h"
 #include "keyboard.h"
+#include "../kshell/kshell.h"
+#include "../shared/shared.h"
 
 bool capsOn;
 bool capsLock;
@@ -66,6 +68,8 @@ UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN
 };
 
 void keyboardHandler(struct InterruptRegisters *regs){
+    sequenceIndex = 0;
+    memset(sequence, 0, sizeof(sequence));
     char scanCode = inPortB(0x60) & 0x7F; //What key is pressed
     char press = inPortB(0x60) & 0x80; //Press down, or released
     
@@ -104,9 +108,12 @@ void keyboardHandler(struct InterruptRegisters *regs){
         default:
             if (press == 0){
                 if (capsOn || capsLock){
-                    printf("%c", uppercase[scanCode]);
+                    //printf("%c", uppercase[scanCode]); //! uppercase letters are not allowed in the current shell
                 }else{
                     printf("%c", lowercase[scanCode]);
+                    sequence[sequenceIndex] = (char)lowercase[scanCode];
+                    sequenceIndex++;
+                
                 }
             }
             
@@ -118,4 +125,8 @@ void initKeyboard(){
     capsOn = false;
     capsLock = false;
     irq_install_handler(1,&keyboardHandler);
+}
+
+void killKeyboard(){
+    irq_uninstall_handler(1);
 }
