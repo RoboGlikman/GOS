@@ -12,7 +12,6 @@
 #include "stdlib/memutil/memutil.h"
 #include "stdint.h"
 #include "stdlib/collections/Node/node.h"
-#include "kshell/kshell.h"
 
 void kmain(uint32_t magic, struct multiboot_info* bootInfo);
 uint32_t getPhysicalAllocStart(struct multiboot_info* bootInfo);
@@ -31,7 +30,6 @@ void kmain(uint32_t magic, struct multiboot_info* bootInfo) {
     kmallocInit(0x1000);
     ramfsInit();
     initKeyboard();
-    
     for(;;);
 }
 

@@ -55,14 +55,29 @@ void test_ramfs(){
     }
     currentColor = (COLOR8_LIGHT_GREY << 8) | (COLOR8_BLACK << 12);
 
-    int file2Fd = ramfsOpenFile(name2, RW);
-    if (file2Fd > 0){
+    void *bufferE = kmalloc(7);
+    int resultS = ramfsReadFile(file1Fd, 1, bufferE, 7);
+    if (resultS == 0){
+        printf("%s\n", (const char*)bufferE);
         currentColor = (COLOR8_LIGHT_GREEN << 8) | (COLOR8_BLACK << 12);
-        printf("test 5: open different file, recieve fd successful!\n");
+        printf("test 5: read from file with one block successful!\n");
         all++;
     } else {
         currentColor = (COLOR8_LIGHT_RED << 8) | (COLOR8_BLACK << 12);
-        printf("test 5: open different file, recieve fd failed!\n");
+        printf("test 5: read from file with one block failed!\n");
+    }
+    kfree(bufferE);
+    currentColor = (COLOR8_LIGHT_GREY << 8) | (COLOR8_BLACK << 12);
+
+
+    int file2Fd = ramfsOpenFile(name2, RW);
+    if (file2Fd > 0){
+        currentColor = (COLOR8_LIGHT_GREEN << 8) | (COLOR8_BLACK << 12);
+        printf("test 6: open different file, recieve fd successful!\n");
+        all++;
+    } else {
+        currentColor = (COLOR8_LIGHT_RED << 8) | (COLOR8_BLACK << 12);
+        printf("test 6: open different file, recieve fd failed!\n");
     }
     currentColor = (COLOR8_LIGHT_GREY << 8) | (COLOR8_BLACK << 12);
     
@@ -70,62 +85,63 @@ void test_ramfs(){
     int result4 = ramfsWriteFile(file2Fd, 0, (const void*)buffer2, strlen(buffer2)+1);
     if (result4 == 0){
         currentColor = (COLOR8_LIGHT_GREEN << 8) | (COLOR8_BLACK << 12);
-        printf("test 6: write to file with multiple blocks successful!\n");
+        printf("test 7: write to file with multiple blocks successful!\n");
         all++;
     } else {
         currentColor = (COLOR8_LIGHT_RED << 8) | (COLOR8_BLACK << 12);
-        printf("test 6: write to file with multiple blocks failed!\n");
+        printf("test 7: write to file with multiple blocks failed!\n");
     }
     currentColor = (COLOR8_LIGHT_GREY << 8) | (COLOR8_BLACK << 12);
     
-    void *buffer3 = kmalloc(7);
-    int result5 = ramfsReadFile(file2Fd, 4, buffer3, 7);
+    void *buffer3 = kmalloc(4095);
+    int result5 = ramfsReadFile(file2Fd, 4, buffer3, 4095);
     if (result5 == 0){
         printf("%s\n", (const char*)buffer3);
         currentColor = (COLOR8_LIGHT_GREEN << 8) | (COLOR8_BLACK << 12);
-        printf("test 7: read from file with multiple blocks at specified offset successful!\n");
+        printf("test 8: read from file with multiple blocks at specified offset successful!\n");
         all++;
     } else {
         currentColor = (COLOR8_LIGHT_RED << 8) | (COLOR8_BLACK << 12);
-        printf("test 7: read from file with multiple blocks at specified offset failed!\n");
+        printf("test 8: read from file with multiple blocks at specified offset failed!\n");
     }
     kfree(buffer3);
     currentColor = (COLOR8_LIGHT_GREY << 8) | (COLOR8_BLACK << 12);
     
-    ramfsListFiles(); // test 8
+    ramfsListFiles(); // test 9
     all++;
 
+    
     int result7 = ramfsDeleteFile(file1Fd);
     if (result7 == 0){
         currentColor = (COLOR8_LIGHT_GREEN << 8) | (COLOR8_BLACK << 12);
-        printf("test 9: file deletion successful!\n");
+        printf("test 10: file deletion successful!\n");
         all++;
     } else {
         currentColor = (COLOR8_LIGHT_RED << 8) | (COLOR8_BLACK << 12);
-        printf("test 9: file deletion failed!\n");
+        printf("test 10: file deletion failed!\n");
     }
     currentColor = (COLOR8_LIGHT_GREY << 8) | (COLOR8_BLACK << 12);
 
-    ramfsListFiles(); // test 10
+    ramfsListFiles(); // test 11
     all++;
 
     const char *name3 = "file3";
     int result9 = ramfsCreateFile(name3, 100);
     if (result9 == 0){
         currentColor = (COLOR8_LIGHT_GREEN << 8) | (COLOR8_BLACK << 12);
-        printf("test 11: best fit successful!\n");
+        printf("test 12: best fit successful!\n");
         all++;
     } else {
         currentColor = (COLOR8_LIGHT_RED << 8) | (COLOR8_BLACK << 12);
-        printf("test 11: best fit failed!\n");
+        printf("test 12: best fit failed!\n");
     }
     currentColor = (COLOR8_LIGHT_GREY << 8) | (COLOR8_BLACK << 12);
-    ramfsListFiles(); // test 12
+    ramfsListFiles(); // test 13
     all++;
 
 
 
-    if (all == 12){
+    if (all == 13){
         currentColor = (COLOR8_LIGHT_MAGENTA << 8) | (COLOR8_BLACK << 12);
         printf("ALL TESTS ARE SUCCESSFUL!\n\n");
         currentColor = (COLOR8_LIGHT_GREY << 8) | (COLOR8_BLACK << 12);

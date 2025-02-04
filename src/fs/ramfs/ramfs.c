@@ -142,7 +142,7 @@ int ramfsDeleteFile(uint32_t fd){
     uint32_t i = fd-3;
 
     if (i < 0){
-        printf("invalid file descriptor\n");
+        printf("invalid file descriptor, couldnt create file!\n");
         return -1;
     }
     initFileContents(fd, (files[i]).size);
@@ -240,13 +240,16 @@ int ramfsReadFile(uint32_t fd, uint32_t offset, void *buffer, uint32_t size) {
             }
             void *blockAddr = (void *)(ramdiskBase + currentBlock * BLOCK_SIZE);
             memcpy((void*)(dest + bytesRead), (const void*)(blockAddr + blockOffset), bytesToRead); 
-
             bytesRead += bytesToRead;
             blockOffset = 0; 
             currentBlock++; 
         }
         const char *tmp = "\0";
-        memcpy((void*)(dest+bytesRead), (const void*)tmp, 1);
+        if (file->size == size && size % BLOCK_SIZE == 0){
+            memcpy((void*)(dest+bytesRead-1), (const void*)tmp, 1);
+        } else { 
+            memcpy((void*)(dest+bytesRead), (const void*)tmp, 1);
+        }
         return 0;
     }
     printf("You don`t have permission to read from this file!\n");

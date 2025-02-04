@@ -57,7 +57,7 @@ void cat(){
     uint32_t size = ramfsGetFileSize(fd);
     
     void *buffer = kmalloc(size);
-    if (ramfsReadFile(fd, 0, buffer, size) != 0){
+    if (ramfsReadFile(fd, 0, buffer, size) != 0){ // file contents len <<<< size
         printf("error reading file!\n");
         return;
     }
@@ -89,7 +89,7 @@ void wf(){
 
     uint32_t j=0;
     for (; i < 64; i++){
-        if (sequence[i] == ' ' || sequence[i] == '\0'){
+        if (sequence[i] == '-' || sequence[i] == '\0'){
             i++;
             j++;
             break;
@@ -156,10 +156,11 @@ void help(){
     printf("\thelp/man: shows this page. usage: [help/man]\n");
     printf("\tls: lists files in entire fs. usage: [ls]\n");
     printf("\tcat: outputs content of a file. usage: [cat] [filename]\n");
-    printf("\twf: write to file. usage: [wf] [filename] [content](|offset)\n");
+    printf("\twf: write to file. usage: [wf] [filename] [content](-offset)\n");
     printf("\ttouch: create a file. usage: [touch] [filename] (size)\n");
     printf("\techo: prints whatever. usage: [echo] [contentToPrint]\n");
-    printf("\tclear: clears the screen. usage: [clear]\n\n");
+    printf("\tclear: clears the screen. usage: [clear]\n");
+    printf("\trm: removes specified file. usage: [rm] [filename]\n\n");
     printf("notes:\n");
     printf("\tPlease do not create a command line longer than 64 characters.\n");
     printf("\tDeleting the '$> ' and trying a command won't work,\n\tpress enter then try again.\n");
@@ -169,5 +170,18 @@ void help(){
 }
 
 void rm(){
+    char fname[32];
+    uint32_t i;
+    for (i=3; i<31 + 3; i++){
+        if (sequence[i] == ' '){
+            i++;
+            break;
+        }
+        fname[i-3] = sequence[i];
+    }
+    fname[i-3-1] = '\0';
 
+    uint32_t fd = ramfsOpenFile(fname, RWX);
+    ramfsDeleteFile(fd);
+    ramfsCloseFile(fd);
 }
