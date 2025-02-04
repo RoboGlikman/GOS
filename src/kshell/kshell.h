@@ -10,8 +10,8 @@ void startCalc();
 void quitCalc();
 void help();
 void welcome();
-static uint32_t getCommand();
-static int getSecondArgIndex(int firstArgIndex);
+uint32_t getCommand();
+int getSecondArgIndex(int firstArgIndex);
 enum commands {
     LS,
     CAT,

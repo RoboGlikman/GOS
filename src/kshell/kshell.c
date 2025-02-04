@@ -8,66 +8,20 @@
 #include "../vga/vga.h"
 #include "../shared/shared.h"
 
-void initKshell(){ //TODO please examine todo.txt
 
-    printf("$> ");
-    while (1){
-        printf("%d\n", sequenceIndex);
-        if (sequenceIndex > 0){
-            uint32_t command = getCommand();       
-            if (command == 69); //magic
-            else {
-                switch (command) {
-                    case LS:
-                        ls();
-                        break;
-                    case CAT:
-                        cat((const char *)&sequence[sequenceIndex + 4]);
-                        break;
-                    case TOUCH:
-                        touch((const char *)&sequence[sequenceIndex + 6], (const char *)&sequence[getSecondArgIndex(sequenceIndex + 6)]);
-                        break;
-                    case WF:
-                        wf((const char *)&sequence[sequenceIndex + 3], (const char *)&sequence[getSecondArgIndex(sequenceIndex + 3)]);
-                        break;
-                    case ECHO:
-                        echo((const char *)&sequence[sequenceIndex + 5]);
-                        break;
-                    case CALC:
-                        printf("Option not supported yet!\n");
-                        //calc((const char *)&sequence[sequenceIndex + 5]);
-                        break;
-                    case HELP:
-                        help();
-                        break;
-                    case WELCOME:
-                        welcome();
-                        break;
-                    default:
-                        printf("Error! Unknown command!\n");
-                        break;
-                }
-            }
-            memset(sequence, 0, sizeof(sequence));
-            sequenceIndex = 0;
-            
-        }
-    }
-}
-
-static int getSecondArgIndex(int firstArgIndex){
+int getSecondArgIndex(int firstArgIndex){
     for (int i=firstArgIndex; i < 64; i++){
         if (sequence[i] == ' ')
             return i;
     }
 }
 
-static uint32_t getCommand(){
+uint32_t getCommand(){
     char command[32];
-    if (sequence[0] == '\n')
-        return 69; //magic
-
-    memcpy(command, sequence, sequenceIndex);
+    uint32_t i=0;
+    
+    memcpy(command, sequence, i);
+    command[i] = '\0';
     printf("cm: %s\n", command);
     if (strcmp(command, "ls") == 0)
         return LS;
@@ -83,9 +37,8 @@ static uint32_t getCommand(){
         return CALC;
     else if (strcmp(command, "help") == 0)
         return HELP;
-    else if (strcmp(command, "welcome")){
-        
-        return WELCOME; }
+    else if (strcmp(command, "welcome"))
+        return WELCOME; 
     else 
         return ERROR;
 }

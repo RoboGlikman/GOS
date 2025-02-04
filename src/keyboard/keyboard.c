@@ -68,11 +68,8 @@ UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN
 };
 
 void keyboardHandler(struct InterruptRegisters *regs){
-    sequenceIndex = 0;
-    memset(sequence, 0, sizeof(sequence));
     char scanCode = inPortB(0x60) & 0x7F; //What key is pressed
     char press = inPortB(0x60) & 0x80; //Press down, or released
-    
     switch(scanCode){
         case 1:
         case 29:
@@ -112,19 +109,58 @@ void keyboardHandler(struct InterruptRegisters *regs){
                 }else{
                     printf("%c", lowercase[scanCode]);
                     sequence[sequenceIndex] = (char)lowercase[scanCode];
-                    sequenceIndex++;
-                
+                    
+                    if (sequence[sequenceIndex] == '\n' && sequenceIndex > 0){
+                        uint32_t command = getCommand();       
+                        switch (command){
+                            case LS:
+                                ls();
+                                break;
+                            case CAT:
+                                printf("easycat!\n");
+                                cat((const char *)&sequence[sequenceIndex + 4]);
+                                break;
+                            case TOUCH:
+                                touch((const char *)&sequence[sequenceIndex + 6], (const char *)&sequence[getSecondArgIndex(sequenceIndex + 6)]);
+                                break;
+                            case WF:
+                                wf((const char *)&sequence[sequenceIndex + 3], (const char *)&sequence[getSecondArgIndex(sequenceIndex + 3)]);
+                                break;
+                            case ECHO:
+                                echo((const char *)&sequence[sequenceIndex + 5]);
+                                break;
+                            case CALC:
+                                printf("Option not supported yet!\n");
+                                //calc((const char *)&sequence[sequenceIndex + 5]);
+                                break;
+                            case HELP:
+                                help();
+                                break;
+                            case WELCOME:
+                                welcome();
+                                break;
+                            default:
+                                printf("Error! Unknown command!\n");
+                                break;
+                        }
+                        memset(sequence, 0, sizeof(sequence));
+                        sequenceIndex = 0;
+                        printf("$> ");
+                    } else {sequenceIndex++;}
+                    
                 }
-            }
-            
-    }
-    
+            }  
+    } 
 }
 
 void initKeyboard(){
+    printf("$> ");
+    sequenceIndex = 0;
+    memset(sequence, 0, sizeof(sequence));
     capsOn = false;
     capsLock = false;
     irq_install_handler(1,&keyboardHandler);
+    //! initKshell();
 }
 
 void killKeyboard(){
