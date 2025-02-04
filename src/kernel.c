@@ -31,6 +31,7 @@ void kmain(uint32_t magic, struct multiboot_info* bootInfo) {
     kmallocInit(0x1000);
     ramfsInit();
     initKeyboard();
+    
     for(;;);
 }
 

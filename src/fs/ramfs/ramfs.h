@@ -3,7 +3,7 @@
 #include "../ramdisk/ramdisk.h"
 
 #define MAX_FILES 128
-#define FDS_RESERVED 3 //0-stdin 1-stdout 2-stderr //!(not implemented yet)
+#define FDS_RESERVED 3
 #define R 4
 #define W 2
 #define X 1

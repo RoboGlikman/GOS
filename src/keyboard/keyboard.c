@@ -8,7 +8,7 @@
 
 bool capsOn;
 bool capsLock;
-
+const char BACKSPACE = 14;
 const uint32_t UNKNOWN = 0xFFFFFFFF;
 const uint32_t ESC = 0xFFFFFFFF - 1;
 const uint32_t CTRL = 0xFFFFFFFF - 2;
@@ -105,49 +105,57 @@ void keyboardHandler(struct InterruptRegisters *regs){
         default:
             if (press == 0){
                 if (capsOn || capsLock){
-                    //printf("%c", uppercase[scanCode]); //! uppercase letters are not allowed in the current shell
-                }else{
+                    //printf("%c", uppercase[scanCode]); //! uppercase letters are not allowed in the current shell, but have a skeleton to later support.
+                }else{ //backspace == 14
                     printf("%c", lowercase[scanCode]);
-                    sequence[sequenceIndex] = (char)lowercase[scanCode];
-                    
-                    if (sequence[sequenceIndex] == '\n' && sequenceIndex > 0){
-                        uint32_t command = getCommand();       
-                        switch (command){
-                            case LS:
-                                ls();
-                                break;
-                            case CAT:
-                                printf("easycat!\n");
-                                cat((const char *)&sequence[sequenceIndex + 4]);
-                                break;
-                            case TOUCH:
-                                touch((const char *)&sequence[sequenceIndex + 6], (const char *)&sequence[getSecondArgIndex(sequenceIndex + 6)]);
-                                break;
-                            case WF:
-                                wf((const char *)&sequence[sequenceIndex + 3], (const char *)&sequence[getSecondArgIndex(sequenceIndex + 3)]);
-                                break;
-                            case ECHO:
-                                echo((const char *)&sequence[sequenceIndex + 5]);
-                                break;
-                            case CALC:
-                                printf("Option not supported yet!\n");
-                                //calc((const char *)&sequence[sequenceIndex + 5]);
-                                break;
-                            case HELP:
-                                help();
-                                break;
-                            case WELCOME:
-                                welcome();
-                                break;
-                            default:
-                                printf("Error! Unknown command!\n");
-                                break;
-                        }
-                        memset(sequence, 0, sizeof(sequence));
-                        sequenceIndex = 0;
-                        printf("$> ");
-                    } else {sequenceIndex++;}
-                    
+                    if (scanCode == BACKSPACE && sequenceIndex > 0){
+                        sequence[sequenceIndex - 1] = 0;
+                        sequenceIndex--;
+                    }
+                    else {
+                        sequence[sequenceIndex] = (char)lowercase[scanCode];
+                        if (sequence[sequenceIndex] == '\n' && sequenceIndex > 0){
+                            sequence[sequenceIndex] = '\0';
+                            uint32_t command = getCommand();   
+                            switch (command){
+                                case LS:
+                                    ls();
+                                    break;
+                                case CAT:
+                                    cat();
+                                    break;
+                                case TOUCH:
+                                    touch();
+                                    break;
+                                case WF:
+                                    wf();
+                                    break;
+                                case ECHO:
+                                    echo();
+                                    break;
+                                case HELP:
+                                    help();
+                                    break;
+                                case CLEAR:
+                                    clear();
+                                    break;
+                                case 69:
+                                    break;
+                                default:
+                                    printf("Unknown command! Try 'help'\n");
+                                    break;
+                            }
+                            memset(sequence, 0, sizeof(sequence));
+                            sequenceIndex = 0;
+                            printf("$> ");
+                        } else {
+                            if (sequence[sequenceIndex] == '\n'){
+                                memset(sequence, 0, sizeof(sequence));
+                                sequenceIndex = 0;
+                                printf("$> ");
+                            } else 
+                                sequenceIndex++;}
+                    }
                 }
             }  
     } 
@@ -160,7 +168,6 @@ void initKeyboard(){
     capsOn = false;
     capsLock = false;
     irq_install_handler(1,&keyboardHandler);
-    //! initKshell();
 }
 
 void killKeyboard(){

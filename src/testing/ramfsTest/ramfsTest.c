@@ -93,7 +93,7 @@ void test_ramfs(){
     
     ramfsListFiles(); // test 8
     all++;
-
+    
     int result7 = ramfsDeleteFile(file1Fd);
     if (result7 == 0){
         currentColor = (COLOR8_LIGHT_GREEN << 8) | (COLOR8_BLACK << 12);

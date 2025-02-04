@@ -33,3 +33,19 @@ char * strncpy(char *dest, const char *src, uint32_t n){
 
    return dest;
 }
+
+uint32_t atoi(const char *s){
+    uint32_t res = 0, idx = 0;
+
+    while (s[idx] == ' ') {
+        idx++;
+    }
+
+    while (s[idx] >= '0' && s[idx] <= '9') {  
+       if (res > 32768 / 10 || (res == 32768 / 10 && s[idx] - '0' > 7)) 
+            return 32768;
+        res = 10 * res + (s[idx++] - '0');
+    }
+
+    return res;
+}
