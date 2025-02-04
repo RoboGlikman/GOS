@@ -33,6 +33,7 @@ int ramfsCreateFile(const char *name, uint32_t size){ //size = size in bytes
 
     uint32_t numBlocksNeededCpy = numBlocksNeeded;
     int j = findBestFit_fs(numBlocksNeeded, name);
+    if (j==-2) return -1;
     while (numBlocksNeededCpy != 0 && j < 0){
         increaseRamdiskSize();
         numBlocksNeededCpy--;
@@ -101,7 +102,7 @@ static int catchBestFit_fs(uint32_t i, uint32_t size){ //size = size in blocks
 static int findBestFit_fs(uint32_t size, const char *name){ // size = size in blocks
     if (locateFileByName(name) >= 0){
         printf("file already exists!\n");
-        return -1;
+        return -2;
     }
 
     uint32_t best_i = -1;
@@ -281,4 +282,10 @@ static int initFileContents(uint32_t fd, uint32_t size){
     }
     fds[fd] = 0;
     return 0;
+}
+
+uint32_t ramfsGetFileSize(uint32_t fd){
+    int fileIndex = fd-FDS_RESERVED;
+    ramfs_file_t *file = &files[fileIndex];
+    return file->size;
 }

@@ -8,7 +8,7 @@ void echo();
 void help();
 void clear();
 uint32_t getCommand();
-
+void rm();
 enum commands {
     LS,
     CAT,
@@ -17,5 +17,6 @@ enum commands {
     ECHO,
     HELP,
     CLEAR,
+    RM,
     ERROR
 };

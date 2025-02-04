@@ -6,6 +6,7 @@
 #include "../../MemoryManager/mm.h"
 
 int all = 0;
+
 void test_ramfs(){
     const char *name1 = "file1";
     int result1 = ramfsCreateFile(name1, 4096); // 1 block
@@ -93,7 +94,7 @@ void test_ramfs(){
     
     ramfsListFiles(); // test 8
     all++;
-    
+
     int result7 = ramfsDeleteFile(file1Fd);
     if (result7 == 0){
         currentColor = (COLOR8_LIGHT_GREEN << 8) | (COLOR8_BLACK << 12);

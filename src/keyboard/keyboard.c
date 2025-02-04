@@ -139,6 +139,9 @@ void keyboardHandler(struct InterruptRegisters *regs){
                                 case CLEAR:
                                     clear();
                                     break;
+                                case RM:
+                                    rm();
+                                    break;
                                 case 69:
                                     break;
                                 default:

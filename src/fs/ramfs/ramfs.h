@@ -34,6 +34,7 @@ static int initFileContents(uint32_t fd, uint32_t size);
 void ramfsCloseFile(uint32_t fd);
 int ramfsOpenFile(const char *name, uint32_t permissions);
 void ramfsInit();
+uint32_t ramfsGetFileSize(uint32_t fd);
 
 
 
