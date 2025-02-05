@@ -9,7 +9,7 @@
 #include "../shared/shared.h"
 #include "../MemoryManager/mm.h"
 
-const char SPACE = 28;
+bool fromW = false;
 //! in touch, echo, wf, cat: start of i=indexOfSpaceBeforeSecondArg
 uint32_t getCommand(){
     char command[32];
@@ -35,6 +35,8 @@ uint32_t getCommand(){
         return CLEAR;
     else if (strcmp(command, "rm") == 0)
         return RM;
+    else if (strcmp(command, "clrf") == 0)
+        return CLRF;
     else 
         return ERROR;
 }
@@ -46,7 +48,12 @@ void ls(){ //will probably be inline
 void cat(){
     char fname[32];
     for (uint32_t i=4; i<31 + 4; i++){
-        fname[i-4] = sequence[i];
+        if (isAlpha(sequence[i]) || sequence[i] == '\0')
+            fname[i-4] = sequence[i];
+        else {
+            printf("only letters are allowed in fnames.\n");
+            return;
+        }
     }
 
     fname[31] = '\0';
@@ -57,7 +64,7 @@ void cat(){
     uint32_t size = ramfsGetFileSize(fd);
     
     void *buffer = kmalloc(size);
-    if (ramfsReadFile(fd, 0, buffer, size) != 0){ // file contents len <<<< size
+    if (ramfsReadFile(fd, 0, buffer, size) != 0){
         printf("error reading file!\n");
         return;
     }
@@ -79,17 +86,27 @@ void wf(){
 
     uint32_t i;
     for (i=3; i<31 + 3; i++){
-        if (sequence[i] == ' '){
+        if (sequence[i] == ' ' || sequence[i] == '\0'){
             i++;
             break;
         }
-        fname[i-3] = sequence[i];
+        if (isAlpha(sequence[i]))
+            fname[i-3] = sequence[i];
+        else {
+            printf("only letters are allowed in fnames.\n");
+            return;
+        }
     }
     fname[i-3-1] = '\0';
+    if (sequence[i-1] == '\0'){
+        fromW = true;
+        clrf();
+        return;
+    }
 
     uint32_t j=0;
     for (; i < 64; i++){
-        if (sequence[i] == '-' || sequence[i] == '\0'){
+        if (sequence[i] == '\0'){
             i++;
             j++;
             break;
@@ -97,20 +114,11 @@ void wf(){
         content[j] = sequence[i];
         j++;
     }
-    content[j] = '\0';
-
-    uint32_t m=0;
-    for(; i<64 && sequence[i] != '\0'; i++){
-        offsetStr[m] = sequence[i];
-        m++;
-    }
-    offsetStr[m] = '\0';
-
-    uint32_t offset = atoi((const char*)offsetStr) == 0 ? 0 : atoi((const char*)offsetStr);
-
+    content[j-1] = '\0';
+    
     uint32_t fd = ramfsOpenFile((const char*)fname, W);
     if (fd < 0) return;
-    if (ramfsWriteFile(fd, offset, (const void*)content, strlen((const char*)content)+1) != 0){
+    if (ramfsWriteFile(fd, 0, (const void*)content, strlen((const char*)content)+1) != 0){
         printf("error writing to file!\n");
         ramfsCloseFile(fd);
         return;
@@ -127,7 +135,12 @@ void touch(){
             i++;
             break;
         }
-        fname[i-6] = sequence[i];
+        if (isAlpha(sequence[i]) || sequence[i] == '\0')
+            fname[i-6] = sequence[i];
+        else {
+            printf("only letters are allowed in fnames.\n");
+            return;
+        }
     }
     fname[i-6-1] = '\0';
 
@@ -142,7 +155,7 @@ void touch(){
 }
 
 void echo(){
-    for (uint32_t i=5; i< (64-5); i++){
+    for (uint32_t i=5; i < 64 - 5; i++){
         printf("%c", sequence[i]);
     }
     printf("\n");
@@ -156,11 +169,12 @@ void help(){
     printf("\thelp/man: shows this page. usage: [help/man]\n");
     printf("\tls: lists files in entire fs. usage: [ls]\n");
     printf("\tcat: outputs content of a file. usage: [cat] [filename]\n");
-    printf("\twf: write to file. usage: [wf] [filename] [content](-offset)\n");
+    printf("\twf: write to file only in beginning. usage: [wf] [filename] [content]\n");
     printf("\ttouch: create a file. usage: [touch] [filename] (size)\n");
     printf("\techo: prints whatever. usage: [echo] [contentToPrint]\n");
     printf("\tclear: clears the screen. usage: [clear]\n");
-    printf("\trm: removes specified file. usage: [rm] [filename]\n\n");
+    printf("\trm: removes specified file. usage: [rm] [filename]\n");
+    printf("\tclrf: cleares file. usage: [clrd] [filename]\n\n");
     printf("notes:\n");
     printf("\tPlease do not create a command line longer than 64 characters.\n");
     printf("\tDeleting the '$> ' and trying a command won't work,\n\tpress enter then try again.\n");
@@ -177,11 +191,35 @@ void rm(){
             i++;
             break;
         }
-        fname[i-3] = sequence[i];
+        if (isAlpha(sequence[i]))
+            fname[i-3] = sequence[i];
+        else {
+            printf("only letters are allowed in fnames.\n");
+            return;
+        }
     }
     fname[i-3-1] = '\0';
 
     uint32_t fd = ramfsOpenFile(fname, RWX);
+
     ramfsDeleteFile(fd);
+}
+
+void clrf(){
+    char fname[32];
+    uint32_t i;
+    uint32_t val = fromW ? 3 : 5;
+    for (i=val; i<31 + val; i++){
+        if (sequence[i] == ' '){
+            i++;
+            break;
+        }
+        fname[i-val] = sequence[i];
+    }
+    fname[i-val-1] = '\0';
+    uint32_t fd = ramfsOpenFile(fname, RWX);
+    if (fd < 0) return;
+    clearFileContents(fd);
     ramfsCloseFile(fd);
+
 }

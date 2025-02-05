@@ -3,7 +3,7 @@
 #include "../../stdlib/memutil/memutil.h"
 #include "../../stdlib/string/string.h"
 #include "../../stdlib/stdio/stdio.h"
-
+#include "../../MemoryManager/mm.h"
 static ramfs_file_t files[MAX_FILES];
 static uint32_t fds[MAX_FILES];
 static uint32_t file_count;
@@ -55,7 +55,7 @@ int ramfsCreateFile(const char *name, uint32_t size){ //size = size in bytes
     files[file_count].size = size;
     files[file_count].start_block = i;
     file_count++;
-    initFileContents(file_count+2, size);
+    initFileContents(file_count+2);
     return 0;
     
 }
@@ -68,7 +68,7 @@ int ramfsOpenFile(const char *name, uint32_t permissions){
     int fileIndex = locateFileByName(name);
 
     if (fileIndex < 0){
-        printf("Couldnt open file!\n");
+        printf("file doesnt exist!\n");
         return -1;
     }
 
@@ -82,7 +82,7 @@ void ramfsCloseFile(uint32_t fd){
         return;
     }
     if (fd < 3){
-        printf("invalid file descriptor!\n");
+        printf("file doesnt exist!\n");
         return;
     }
     fds[fd] = 0;
@@ -142,10 +142,10 @@ int ramfsDeleteFile(uint32_t fd){
     uint32_t i = fd-3;
 
     if (i < 0){
-        printf("invalid file descriptor, couldnt create file!\n");
+        printf("file doesnt exist!\n");
         return -1;
     }
-    initFileContents(fd, (files[i]).size);
+    initFileContents(fd);
 
     uint32_t numBlocks = CEIL_DIV(files[i].size, BLOCK_SIZE);
 
@@ -165,7 +165,7 @@ int ramfsWriteFile(uint32_t fd, uint32_t offset, const void *buffer, uint32_t si
         return -1;
     }
     if (fd < 3){
-        printf("invalid file descriptor!\n");
+        printf("file doesnt exist!\n");
         return -1;
     }
 
@@ -183,21 +183,20 @@ int ramfsWriteFile(uint32_t fd, uint32_t offset, const void *buffer, uint32_t si
 
         uint32_t bytesWritten = 0;
         const char *src = (const char *)buffer;
-
+        
         while (bytesWritten < size) {
-            uint32_t bytesToWrite = BLOCK_SIZE - blockOffset; 
+            uint32_t bytesToWrite = BLOCK_SIZE - blockOffset;
+
             if (bytesToWrite > size - bytesWritten) 
                 bytesToWrite = size - bytesWritten;
             
             void *blockAddr = (void *)(ramdiskBase + currentBlock * BLOCK_SIZE); 
-
-            memcpy((char *)blockAddr + blockOffset, src + bytesWritten, bytesToWrite); 
-            
+            memcpy((blockAddr + blockOffset), (void*)(src + bytesWritten), bytesToWrite);
             bytesWritten += bytesToWrite;
             blockOffset = 0; 
             currentBlock++; 
         }
-
+        
         return 0;
     }
     printf("You don`t have permission to write to this file!\n");
@@ -211,7 +210,7 @@ int ramfsReadFile(uint32_t fd, uint32_t offset, void *buffer, uint32_t size) {
     }
 
     if (fd < 3){
-        printf("invalid file descriptor!\n");
+        printf("file doesnt exist!\n");
         return -1;
     }
     if (fds[fd] >= R){
@@ -239,7 +238,7 @@ int ramfsReadFile(uint32_t fd, uint32_t offset, void *buffer, uint32_t size) {
                 
             }
             void *blockAddr = (void *)(ramdiskBase + currentBlock * BLOCK_SIZE);
-            memcpy((void*)(dest + bytesRead), (const void*)(blockAddr + blockOffset), bytesToRead); 
+            memcpy((void*)(dest + bytesRead), (const void*)(blockAddr + blockOffset),bytesToRead); 
             bytesRead += bytesToRead;
             blockOffset = 0; 
             currentBlock++; 
@@ -264,7 +263,7 @@ void ramfsListFiles(){
     if (file_count == 0)
         printf("no files to list...\n");
     for (uint32_t i=0; i<file_count; i++){
-        printf("name: %s\tsize: %u bytes\n", files[i].name, files[i].size);
+        printf("%s\n", files[i].name);
     }
 }
 
@@ -277,14 +276,20 @@ static int locateFileByName(const char* name){
     return -1;
 }
 
-static int initFileContents(uint32_t fd, uint32_t size){
-    const char *buffer = "";
-    fds[fd] = W;
-    for (int i=0; i<size; i++){
-        ramfsWriteFile(fd, i, (const void*)buffer, 1);
+static int initFileContents(uint32_t fd){ //native
+    if (fd < 3){
+        printf("file doesnt exist!\n");
+        return -1;
     }
+    const char *buffer = "";
+    fds[fd] += W;
+    ramfsWriteFile(fd, 0, (const void*)buffer, ramfsGetFileSize(fd));
     fds[fd] = 0;
     return 0;
+}
+
+int clearFileContents(uint32_t fd){ //non native implementation
+    return initFileContents(fd);
 }
 
 uint32_t ramfsGetFileSize(uint32_t fd){

@@ -10,10 +10,9 @@ char* strcat(char *dest, char *src) {
 }
 
 uint32_t strlen(const char* str) {
-	uint32_t len = 0;
-	while (str[len])
-		len++;
-	return len;
+        const char *s;
+        for (s = str; *s; ++s);
+        return (s - str);
 }
 
 int32_t strcmp(char s1[], char s2[]) {
@@ -48,4 +47,8 @@ uint32_t atoi(const char *s){
     }
 
     return res;
+}
+
+uint32_t isAlpha(char c){
+    return ((c>=0x41)&&((c)<=0x5A)) || (((c)>=0x61)&&((c)<=0x7A));
 }

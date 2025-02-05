@@ -142,6 +142,9 @@ void keyboardHandler(struct InterruptRegisters *regs){
                                 case RM:
                                     rm();
                                     break;
+                                case CLRF:
+                                    clrf();
+                                    break;
                                 case 69:
                                     break;
                                 default:

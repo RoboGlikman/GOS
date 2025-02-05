@@ -9,6 +9,7 @@ void help();
 void clear();
 uint32_t getCommand();
 void rm();
+void clrf();
 enum commands {
     LS,
     CAT,
@@ -18,5 +19,6 @@ enum commands {
     HELP,
     CLEAR,
     RM,
-    ERROR
+    ERROR,
+    CLRF
 };
